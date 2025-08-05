@@ -1,58 +1,215 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <div class="max-w-md mx-auto">
-      <div class="card">
-        <div v-if="loading" class="text-center py-8">
-          <div
-            class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"
-          ></div>
-          <p class="mt-4 text-gray-600">Загрузка данных пользователя...</p>
+  <div
+    class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50"
+  >
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-100">
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center"
+            >
+              <span class="text-white font-bold text-lg">VK</span>
+            </div>
+            <div>
+              <h1 class="text-lg font-semibold text-gray-900">Mini App</h1>
+              <p class="text-sm text-gray-500">День рождения друзей</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-gray-400">Сегодня</div>
+            <div class="text-sm font-medium text-gray-900">
+              {{ todayFormatted }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-6">
+      <div class="max-w-md mx-auto">
+        <!-- Loading State -->
+        <div v-if="loading" class="text-center py-12">
+          <div class="relative">
+            <div
+              class="w-16 h-16 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mx-auto"
+            ></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="w-8 h-8 bg-blue-500 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+          <p class="mt-6 text-gray-600 font-medium">
+            Загрузка данных пользователя...
+          </p>
         </div>
 
-        <div v-else-if="user" class="text-center">
-          <div class="mb-6">
-            <img
-              :src="user.photo_200"
-              :alt="user.first_name"
-              class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-blue-100"
-            />
-            <h1 class="text-2xl font-bold text-gray-900 mb-2">
-              {{ user.first_name }} {{ user.last_name }}
-            </h1>
-            <p class="text-gray-600">ID: {{ user.id }}</p>
-            <p v-if="vkConfig" class="text-sm text-gray-500 mt-2">
-              App ID: {{ vkConfig.app_id }} | Platform: {{ vkConfig.platform }}
-            </p>
+        <!-- User Profile -->
+        <div v-else-if="user" class="space-y-6">
+          <!-- User Card -->
+          <div
+            class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100"
+          >
+            <div class="text-center">
+              <div class="relative inline-block">
+                <img
+                  :src="user.photo_200"
+                  :alt="user.first_name"
+                  class="w-24 h-24 rounded-full border-4 border-white shadow-lg mx-auto"
+                />
+                <div
+                  class="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center"
+                >
+                  <span class="text-white text-xs">✓</span>
+                </div>
+              </div>
+              <h2 class="text-2xl font-bold text-gray-900 mt-4">
+                {{ user.first_name }} {{ user.last_name }}
+              </h2>
+              <p class="text-gray-500 text-sm">ID: {{ user.id }}</p>
+              <p v-if="vkConfig" class="text-xs text-gray-400 mt-2">
+                App ID: {{ vkConfig.app_id }} | {{ vkConfig.platform }}
+              </p>
+            </div>
           </div>
 
-          <button @click="congratulateFriend" class="btn-primary w-full">
-            🎉 Поздравить друга
-          </button>
+          <!-- Action Buttons -->
+          <div class="space-y-3">
+            <button
+              @click="congratulateFriend"
+              class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105 active:scale-95"
+            >
+              <span class="flex items-center justify-center space-x-2">
+                <span class="text-xl">🎉</span>
+                <span>Поздравить друга</span>
+              </span>
+            </button>
+
+            <button
+              @click="getBirthdayFriends"
+              :disabled="birthdayLoading"
+              class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105 active:scale-95"
+            >
+              <span class="flex items-center justify-center space-x-2">
+                <span
+                  v-if="birthdayLoading"
+                  class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+                ></span>
+                <span v-else class="text-xl">🎂</span>
+                <span>{{
+                  birthdayLoading ? "Поиск..." : "Найти именинников"
+                }}</span>
+              </span>
+            </button>
+          </div>
+
+          <!-- Birthday Friends Results -->
+          <div
+            v-if="birthdayError"
+            class="bg-red-50 border border-red-200 rounded-xl p-4"
+          >
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center"
+              >
+                <span class="text-red-600 text-sm">⚠️</span>
+              </div>
+              <div>
+                <h3 class="font-medium text-red-800">Ошибка</h3>
+                <p class="text-sm text-red-600">{{ birthdayError }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            v-if="birthdayFriends.length > 0"
+            class="bg-green-50 border border-green-200 rounded-xl p-4"
+          >
+            <div class="flex items-center space-x-3 mb-4">
+              <div
+                class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center"
+              >
+                <span class="text-green-600 text-sm">🎂</span>
+              </div>
+              <div>
+                <h3 class="font-medium text-green-800">Именинники сегодня</h3>
+                <p class="text-sm text-green-600">
+                  {{ birthdayFriends.length }}
+                  {{
+                    birthdayFriends.length === 1
+                      ? "человек"
+                      : birthdayFriends.length < 5
+                      ? "человека"
+                      : "человек"
+                  }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Friends List -->
+            <div class="space-y-3">
+              <div
+                v-for="friend in birthdayFriends"
+                :key="friend.id"
+                class="bg-white rounded-lg p-3 flex items-center space-x-3 shadow-sm"
+              >
+                <img
+                  :src="friend.photo_100"
+                  :alt="friend.first_name"
+                  class="w-12 h-12 rounded-full"
+                />
+                <div class="flex-1">
+                  <h4 class="font-medium text-gray-900">
+                    {{ friend.first_name }} {{ friend.last_name }}
+                  </h4>
+                  <p class="text-sm text-gray-500">Сегодня день рождения! 🎉</p>
+                </div>
+                <button
+                  class="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center transition-colors"
+                >
+                  <span class="text-blue-600 text-sm">💬</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div
+            v-if="
+              birthdayFriends.length === 0 && !birthdayLoading && !birthdayError
+            "
+            class="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center"
+          >
+            <div
+              class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <span class="text-gray-400 text-2xl">🎂</span>
+            </div>
+            <h3 class="font-medium text-gray-900 mb-2">Нет именинников</h3>
+            <p class="text-sm text-gray-500">
+              Сегодня у ваших друзей нет дней рождения
+            </p>
+          </div>
         </div>
 
-        <div v-else class="text-center py-8">
-          <div class="text-red-500 mb-4">
-            <svg
-              class="w-12 h-12 mx-auto"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-              ></path>
-            </svg>
+        <!-- Error State -->
+        <div v-else class="text-center py-12">
+          <div
+            class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <span class="text-red-500 text-3xl">⚠️</span>
           </div>
           <h2 class="text-xl font-semibold text-gray-900 mb-2">
             Ошибка загрузки
           </h2>
-          <p class="text-gray-600">
+          <p class="text-gray-600 mb-6">
             {{ error || "Не удалось загрузить данные пользователя" }}
           </p>
-          <button @click="initVK" class="btn-primary mt-4">
+          <button
+            @click="initVK"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105"
+          >
             Попробовать снова
           </button>
         </div>
@@ -62,9 +219,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import bridge from "@vkontakte/vk-bridge";
 import { useVKConfig } from "@/composables/useVKConfig";
+import { useBirthdayFriends } from "@/composables/useBirthdayFriends";
 
 interface VKUser {
   id: number;
@@ -79,6 +237,23 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 const { getVKParams, isVKEnvironment } = useVKConfig();
 const vkConfig = ref<any>(null);
+
+// Birthday friends composable
+const {
+  birthdayFriends,
+  loading: birthdayLoading,
+  error: birthdayError,
+  fetchBirthdayFriends,
+} = useBirthdayFriends();
+
+// Форматированная дата
+const todayFormatted = computed(() => {
+  const today = new Date();
+  return today.toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+  });
+});
 
 const initVK = async () => {
   try {
@@ -132,6 +307,14 @@ const initVK = async () => {
 const congratulateFriend = () => {
   // TODO: Реализовать логику поздравления друга
   alert("Функция поздравления друга будет реализована позже!");
+};
+
+const getBirthdayFriends = async () => {
+  try {
+    await fetchBirthdayFriends();
+  } catch (err) {
+    console.error("Ошибка получения друзей с днем рождения:", err);
+  }
 };
 
 onMounted(() => {
