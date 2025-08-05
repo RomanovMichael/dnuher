@@ -1,0 +1,39 @@
+{
+  "name": "vk-mini-app",
+  "version": "1.0.0",
+  "description": "VK Mini App с Vue 3, Vite и TailwindCSS",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "keywords": [
+    "vk",
+    "mini-app",
+    "vue",
+    "typescript",
+    "tailwindcss"
+  ],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "dependencies": {
+    "@vkontakte/vk-bridge": "^2.15.7",
+    "pinia": "^2.1.0",
+    "vue": "^3.4.0",
+    "vue-router": "^4.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^24.2.0",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.9.2",
+    "vite": "^7.0.6",
+    "vue-tsc": "^3.0.5"
+  }
+}
