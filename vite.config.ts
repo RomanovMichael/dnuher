@@ -10,12 +10,12 @@ export default defineConfig({
       "@": resolve(__dirname, "src"),
     },
   },
-  // server: {
-  //   https: {
-  //     key: readFileSync("key.pem"),
-  //     cert: readFileSync("cert.pem"),
-  //   },
-  //   port: 443,
-  //   host: "localhost",
-  // },
+  server: {
+    https: {
+      key: readFileSync("key.pem"),
+      cert: readFileSync("cert.pem"),
+    },
+    port: 443,
+    host: "localhost",
+  },
 });
