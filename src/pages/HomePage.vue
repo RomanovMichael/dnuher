@@ -411,10 +411,10 @@ const initVK = async () => {
   }
 };
 
-const congratulateFriend = () => {
-  // TODO: Реализовать логику поздравления друга
-  alert("Функция поздравления друга будет реализована позже!");
-};
+// const congratulateFriend = () => {
+//   // TODO: Реализовать логику поздравления друга
+//   alert("Функция поздравления друга будет реализована позже!");
+// };
 
 const sendMessage = async (friend: any) => {
   if (!messageTemplate.value.trim()) {
