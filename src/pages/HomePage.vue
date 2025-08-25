@@ -49,7 +49,7 @@
 
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-6">
-      <div class="max-w-md mx-auto">
+      <div class="max-w-6xl mx-auto">
         <!-- Loading State -->
         <div v-if="loading || birthdayLoading" class="text-center py-12">
           <div class="relative">
@@ -69,62 +69,62 @@
           </p>
         </div>
 
-        <!-- User Profile -->
-        <div v-else-if="user" class="space-y-6">
-          <!-- Action Buttons -->
-          <div class="space-y-3">
-            <!-- Message Template Textarea -->
-            <div
-              class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100"
-            >
-              <div class="flex items-center justify-between mb-3">
-                <h3 class="text-lg font-semibold text-gray-900">
-                  Шаблон поздравления
-                </h3>
-                <div class="flex items-center space-x-2">
-                  <div
-                    :class="
-                      canSendMessages
-                        ? 'w-3 h-3 bg-green-500 rounded-full'
-                        : 'w-3 h-3 bg-red-500 rounded-full'
-                    "
-                  ></div>
-                  <span
-                    :class="
-                      canSendMessages
-                        ? 'text-green-600 text-sm'
-                        : 'text-red-600 text-sm'
-                    "
-                  >
-                    {{ canSendMessages ? "Доступно" : "Требует разрешения" }}
-                  </span>
-                </div>
-              </div>
-
-              <textarea
-                v-model="messageTemplate"
-                placeholder="Введите шаблон поздравления для друзей..."
-                class="w-full h-24 p-3 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              ></textarea>
-              <p class="text-xs text-gray-500 mt-2">
-                Используйте {name} для подстановки имени друга
-              </p>
-
-              <!-- Warning about permissions -->
-              <div
-                v-if="!canSendMessages"
-                class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg"
-              >
-                <div class="flex items-center space-x-2">
-                  <span class="text-yellow-600">⚠️</span>
-                  <span class="text-sm text-yellow-800">
-                    Для отправки сообщений необходимо разрешить доступ к
-                    сообщениям в настройках VK
-                  </span>
-                </div>
+        <!-- Main Layout -->
+        <div v-else-if="user" class="space-y-4">
+          <!-- Message Template Card -->
+          <div
+            class="bg-white rounded-2xl shadow-lg p-4 border border-gray-100"
+          >
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-base font-semibold text-gray-900">
+                Шаблон поздравления
+              </h3>
+              <div class="flex items-center space-x-2">
+                <div
+                  :class="
+                    canSendMessages
+                      ? 'w-3 h-3 bg-green-500 rounded-full'
+                      : 'w-3 h-3 bg-red-500 rounded-full'
+                  "
+                ></div>
+                <span
+                  :class="
+                    canSendMessages
+                      ? 'text-green-600 text-xs'
+                      : 'text-red-600 text-xs'
+                  "
+                >
+                  {{ canSendMessages ? "Доступно" : "Требует разрешения" }}
+                </span>
               </div>
             </div>
 
+            <textarea
+              v-model="messageTemplate"
+              placeholder="Введите шаблон поздравления для друзей..."
+              class="w-full h-20 p-3 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            ></textarea>
+            <p class="text-xs text-gray-500 mt-2">
+              Используйте {name} для подстановки имени друга
+            </p>
+
+            <!-- Warning about permissions -->
+            <div
+              v-if="!canSendMessages"
+              class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg"
+            >
+              <div class="flex items-center space-x-2">
+                <span class="text-yellow-600">⚠️</span>
+                <span class="text-xs text-yellow-800">
+                  Для отправки сообщений необходимо разрешить доступ к
+                  сообщениям в настройках VK
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Control Buttons -->
+          <div class="space-y-3">
             <!-- Cache Refresh Button -->
             <button
               v-if="birthdayFriends.length > 0"
@@ -159,82 +159,101 @@
 
           <div
             v-if="birthdayFriends.length > 0"
-            class="bg-green-50 border border-green-200 rounded-xl p-4"
+            class="bg-white rounded-2xl shadow-lg border border-gray-100"
           >
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center space-x-3">
-                <div
-                  class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center"
-                >
-                  <span class="text-green-600 text-sm">🎂</span>
+            <!-- Header -->
+            <div class="p-4 border-b border-gray-100">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center"
+                  >
+                    <span class="text-green-600 text-sm">🎂</span>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900">
+                      Именинники сегодня
+                    </h3>
+                    <p class="text-sm text-gray-600">
+                      {{ birthdayFriends.length }}
+                      {{
+                        birthdayFriends.length === 1
+                          ? "человек"
+                          : birthdayFriends.length < 5
+                          ? "человека"
+                          : "человек"
+                      }}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 class="font-medium text-green-800">Именинники сегодня</h3>
-                  <p class="text-sm text-green-600">
-                    {{ birthdayFriends.length }}
-                    {{
-                      birthdayFriends.length === 1
-                        ? "человек"
-                        : birthdayFriends.length < 5
-                        ? "человека"
-                        : "человек"
-                    }}
-                  </p>
+                <!-- Cache indicator -->
+                <div class="flex items-center space-x-2">
+                  <div
+                    :class="
+                      isFromCache
+                        ? 'w-2 h-2 bg-blue-500 rounded-full'
+                        : 'w-2 h-2 bg-green-500 rounded-full'
+                    "
+                  ></div>
+                  <span
+                    :class="
+                      isFromCache
+                        ? 'text-blue-600 text-xs'
+                        : 'text-green-600 text-xs'
+                    "
+                  >
+                    {{ isFromCache ? "Кэш" : "API" }}
+                  </span>
                 </div>
               </div>
-              <!-- Cache indicator -->
-              <div class="flex items-center space-x-2">
-                <div
-                  :class="
-                    isFromCache
-                      ? 'w-2 h-2 bg-blue-500 rounded-full'
-                      : 'w-2 h-2 bg-green-500 rounded-full'
-                  "
-                ></div>
-                <span
-                  :class="
-                    isFromCache
-                      ? 'text-blue-600 text-xs'
-                      : 'text-green-600 text-xs'
-                  "
-                >
-                  {{ isFromCache ? "Кэш" : "API" }}
-                </span>
+
+              <!-- Cache info -->
+              <div
+                v-if="isFromCache"
+                class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg"
+              >
+                <p class="text-xs text-blue-600 text-center">
+                  Данные загружены из кэша для экономии запросов
+                </p>
               </div>
             </div>
 
             <!-- Friends List -->
-            <div class="space-y-3">
-              <div
-                v-for="friend in birthdayFriends"
-                :key="friend.id"
-                class="bg-white rounded-lg p-3 flex items-center space-x-3 shadow-sm"
-              >
-                <img
-                  :src="friend.photo_100"
-                  :alt="friend.first_name"
-                  class="w-12 h-12 rounded-full"
-                />
-                <div class="flex-1">
-                  <h4 class="font-medium text-gray-900">
-                    {{ friend.first_name }} {{ friend.last_name }}
-                  </h4>
-                  <p class="text-sm text-gray-500">Сегодня день рождения! 🎉</p>
-                </div>
-                <button
-                  @click="sendMessage(friend)"
-                  :disabled="!messageTemplate.trim() || !canSendMessages"
-                  class="w-8 h-8 bg-blue-100 hover:bg-blue-200 disabled:bg-gray-100 disabled:cursor-not-allowed rounded-full flex items-center justify-center transition-colors"
-                  :title="
-                    !canSendMessages
-                      ? 'Нет прав на отправку сообщений'
-                      : !messageTemplate.trim()
-                      ? 'Сначала введите шаблон сообщения'
-                      : 'Отправить поздравление'
-                  "
+            <div class="p-4">
+              <div class="space-y-3">
+                <div
+                  v-for="friend in birthdayFriends"
+                  :key="friend.id"
+                  class="bg-gray-50 rounded-lg p-3 flex items-center space-x-3 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <span class="text-blue-600 text-sm">💬</span>
-                </button>
+                  <img
+                    :src="friend.photo_100"
+                    :alt="friend.first_name"
+                    class="w-12 h-12 rounded-full flex-shrink-0"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <h4 class="font-semibold text-gray-900 text-base truncate">
+                      {{ friend.first_name }} {{ friend.last_name }}
+                    </h4>
+                    <p class="text-sm text-gray-600">
+                      Сегодня день рождения! 🎉
+                    </p>
+                  </div>
+                  <button
+                    @click="sendMessage(friend)"
+                    :disabled="!messageTemplate.trim() || !canSendMessages"
+                    class="w-8 h-8 bg-blue-100 hover:bg-blue-200 disabled:bg-gray-100 disabled:cursor-not-allowed rounded-full flex items-center justify-center transition-colors flex-shrink-0"
+                    :title="
+                      !canSendMessages
+                        ? 'Нет прав на отправку сообщений'
+                        : !messageTemplate.trim()
+                        ? 'Сначала введите шаблон сообщения'
+                        : 'Отправить поздравление'
+                    "
+                  >
+                    <span class="text-blue-600 text-sm">💬</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -244,7 +263,7 @@
             v-if="
               birthdayFriends.length === 0 && !birthdayLoading && !birthdayError
             "
-            class="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center"
+            class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 text-center"
           >
             <div
               class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -252,7 +271,7 @@
               <span class="text-gray-400 text-2xl">🎂</span>
             </div>
             <h3 class="font-medium text-gray-900 mb-2">Нет именинников</h3>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-gray-600">
               Сегодня у ваших друзей нет дней рождения
             </p>
           </div>
