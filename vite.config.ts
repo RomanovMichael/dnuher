@@ -11,11 +11,11 @@ export default defineConfig({
     },
   },
   server: {
-    https: {
-      key: readFileSync("key.pem"),
-      cert: readFileSync("cert.pem"),
-    },
-    port: 443,
-    host: "localhost",
+    // https: {
+    //   key: readFileSync("key.pem"),
+    //   cert: readFileSync("cert.pem"),
+    // },
+    // port: 443,
+    // host: "localhost",
   },
 });
