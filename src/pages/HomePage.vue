@@ -2,11 +2,56 @@
   <div
     class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50"
   >
+    <!-- Compact Header -->
+    <div class="bg-white shadow-sm border-b border-gray-100">
+      <div class="container mx-auto px-4 py-3">
+        <div class="flex items-center justify-between">
+          <!-- User Info -->
+          <div class="flex items-center space-x-3">
+            <div class="relative">
+              <img
+                v-if="user"
+                :src="user.photo_200"
+                :alt="user.first_name"
+                class="w-10 h-10 rounded-full border-2 border-white shadow-sm"
+              />
+              <div
+                v-if="user"
+                class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white flex items-center justify-center"
+              >
+                <span class="text-white text-xs">✓</span>
+              </div>
+            </div>
+            <div v-if="user">
+              <h1 class="text-lg font-semibold text-gray-900">
+                {{ user.first_name }} {{ user.last_name }}
+              </h1>
+              <div class="flex items-center space-x-2">
+                <p class="text-xs text-gray-500">ID: {{ user.id }}</p>
+                <span v-if="vkConfig" class="text-xs text-gray-400">|</span>
+                <p v-if="vkConfig" class="text-xs text-gray-400">
+                  {{ vkConfig.platform }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date -->
+          <div class="text-right">
+            <div class="text-xs text-gray-400">Сегодня</div>
+            <div class="text-sm font-medium text-gray-900">
+              {{ todayFormatted }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-6">
       <div class="max-w-md mx-auto">
         <!-- Loading State -->
-        <div v-if="loading" class="text-center py-12">
+        <div v-if="loading || birthdayLoading" class="text-center py-12">
           <div class="relative">
             <div
               class="w-16 h-16 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mx-auto"
@@ -16,45 +61,16 @@
             </div>
           </div>
           <p class="mt-6 text-gray-600 font-medium">
-            Загрузка данных пользователя...
+            {{
+              loading
+                ? "Загрузка данных пользователя..."
+                : "Поиск именинников..."
+            }}
           </p>
         </div>
 
         <!-- User Profile -->
         <div v-else-if="user" class="space-y-6">
-          <div class="text-right">
-            <div class="text-xs text-gray-400">Сегодня</div>
-            <div class="text-sm font-medium text-gray-900">
-              {{ todayFormatted }}
-            </div>
-          </div>
-          <!-- User Card -->
-          <div
-            class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100"
-          >
-            <div class="text-center">
-              <div class="relative inline-block">
-                <img
-                  :src="user.photo_200"
-                  :alt="user.first_name"
-                  class="w-24 h-24 rounded-full border-4 border-white shadow-lg mx-auto"
-                />
-                <div
-                  class="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center"
-                >
-                  <span class="text-white text-xs">✓</span>
-                </div>
-              </div>
-              <h2 class="text-2xl font-bold text-gray-900 mt-4">
-                {{ user.first_name }} {{ user.last_name }}
-              </h2>
-              <p class="text-gray-500 text-sm">ID: {{ user.id }}</p>
-              <p v-if="vkConfig" class="text-xs text-gray-400 mt-2">
-                App ID: {{ vkConfig.app_id }} | {{ vkConfig.platform }}
-              </p>
-            </div>
-          </div>
-
           <!-- Action Buttons -->
           <div class="space-y-3">
             <!-- Message Template Textarea -->
@@ -108,23 +124,6 @@
                 </div>
               </div>
             </div>
-
-            <button
-              @click="getBirthdayFriends"
-              :disabled="birthdayLoading"
-              class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105 active:scale-95"
-            >
-              <span class="flex items-center justify-center space-x-2">
-                <span
-                  v-if="birthdayLoading"
-                  class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
-                ></span>
-                <span v-else class="text-xl">🎂</span>
-                <span>{{
-                  birthdayLoading ? "Поиск..." : "Найти именинников"
-                }}</span>
-              </span>
-            </button>
 
             <!-- Cache Refresh Button -->
             <button
@@ -201,16 +200,6 @@
                 >
                   {{ isFromCache ? "Кэш" : "API" }}
                 </span>
-              </div>
-
-              <!-- Cache info -->
-              <div
-                v-if="isFromCache"
-                class="mb-4 p-2 bg-blue-50 border border-blue-200 rounded-lg"
-              >
-                <p class="text-xs text-blue-600 text-center">
-                  Данные загружены из кэша для экономии запросов
-                </p>
               </div>
             </div>
 
@@ -486,14 +475,6 @@ const sendMessage = async (friend: any) => {
   }
 };
 
-const getBirthdayFriends = async () => {
-  try {
-    await fetchBirthdayFriends();
-  } catch (err) {
-    console.error("Ошибка получения друзей с днем рождения:", err);
-  }
-};
-
 const refreshBirthdayCache = async () => {
   try {
     await refreshCache();
@@ -504,8 +485,8 @@ const refreshBirthdayCache = async () => {
   }
 };
 
-onMounted(() => {
-  initVK();
+onMounted(async () => {
+  await initVK();
 
   // Автоматически загружаем кэшированных друзей, если они есть
   const cached = getCachedFriends();
@@ -513,6 +494,10 @@ onMounted(() => {
     console.log("Автоматически загружаем кэшированных друзей");
     birthdayFriends.value = cached.friends;
     isFromCache.value = true;
+  } else {
+    // Если кэша нет, автоматически загружаем данные с VK API
+    console.log("Кэш не найден, автоматически загружаем данные с VK API");
+    await fetchBirthdayFriends();
   }
 });
 </script>
